@@ -1,8 +1,12 @@
-<p align="center"><img src="icons/512.png" width="128"></p>
+<p align="center"><img src="images/512.png" width="128"></p>
 
 # *Layer*
 
-Layer is a CSS editor for Chrome. Open its toolbar popup and write CSS for the current hostname or select Global to edit the stylesheet shared by all sites. Each edit is saved in the current browser profile and applied to matching open pages.
+Layer is a minimal browser extension for Chromium-based browsers that lets you customize websites with CSS. Write global styles or styles for individual websites directly from the browser toolbar. Changes are saved automatically and applied to matching open pages without reloading.
+
+## *Preview*
+
+<p align="center"><img src="images/preview.png" width="512"></p>
 
 ## *Install*
 
