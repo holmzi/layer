@@ -1,3 +1,5 @@
+<p align="center"><img src="icons/512.png" width="128"></p>
+
 # *Layer*
 
 Layer is a CSS editor for Chrome. Open its toolbar popup and write CSS for the current hostname or select Global to edit the stylesheet shared by all sites. Each edit is saved in the current browser profile and applied to matching open pages.
