@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="color-scheme" content="dark">
+    <title>Layer</title>
+    <link rel="stylesheet" href="popup.css">
+    <script src="../styles.js" defer></script>
+    <script src="popup.js" defer></script>
+</head>
+<body>
+    <header>
+        <fieldset id="scopes" aria-label="Style scope" disabled>
+            <label>
+                <input type="radio" name="scope" value="global" checked>
+                <span>Global</span>
+            </label>
+            <label>
+                <input id="site" type="radio" name="scope" value="site" disabled>
+                <span id="hostname">Site</span>
+            </label>
+        </fieldset>
+        <label class="switch">
+            <input id="enabled" type="checkbox" role="switch" disabled>
+        </label>
+    </header>
+    <main>
+        <p id="error" role="alert" hidden></p>
+        <div class="editor-area">
+            <div id="line-numbers" aria-hidden="true">
+                <div id="line-number-content"></div>
+            </div>
+            <div class="editor-content">
+                <div id="syntax-layer" aria-hidden="true">
+                    <pre id="syntax-content"></pre>
+                </div>
+                <textarea id="editor" aria-label="CSS" spellcheck="false" autocomplete="off"
+                    autocapitalize="off" autocorrect="off" writingsuggestions="false"
+                    wrap="off" disabled></textarea>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

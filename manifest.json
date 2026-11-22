@@ -1,0 +1,25 @@
+{
+    "manifest_version": 3,
+    "name": "Layer",
+    "version": "1.0.0",
+    "description": "Edit custom CSS for every website or just the current one.",
+    "minimum_chrome_version": "106",
+    "permissions": ["storage", "scripting"],
+    "host_permissions": ["<all_urls>"],
+    "icons": { "128": "icon.png" },
+    "action": {
+        "default_title": "Layer",
+        "default_popup": "popup/index.html"
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["styles.js", "content.js"],
+            "run_at": "document_start",
+            "all_frames": true
+        }
+    ]
+}
