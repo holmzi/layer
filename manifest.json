@@ -6,7 +6,7 @@
     "minimum_chrome_version": "106",
     "permissions": ["storage", "scripting"],
     "host_permissions": ["<all_urls>"],
-    "icons": { "128": "icons/128.png" },
+    "icons": { "128": "images/128.png" },
     "action": {
         "default_title": "Layer",
         "default_popup": "popup/index.html"
