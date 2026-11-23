@@ -75,24 +75,34 @@ function scanSeparators(text, separators, callback) {
             else if (char === quote) quote = "";
             continue;
         }
-        if (char === "/" && next === "*") {
-            comment = true;
-            index++;
-            continue;
+        switch (char) {
+            case "/":
+                if (next !== "*") break;
+                comment = true;
+                index++;
+                continue;
+            case "\\":
+                index++;
+                continue;
+            case "\"":
+            case "'":
+                quote = char;
+                continue;
+            case "(":
+                parentheses++;
+                continue;
+            case ")":
+                parentheses = Math.max(0, parentheses - 1);
+                continue;
+            case "[":
+                brackets++;
+                continue;
+            case "]":
+                brackets = Math.max(0, brackets - 1);
+                continue;
         }
-        if (char === "\\") {
-            index++;
-            continue;
-        }
-        if (char === "\"" || char === "'") {
-            quote = char;
-            continue;
-        }
-        if (char === "(") parentheses++;
-        else if (char === ")") parentheses = Math.max(0, parentheses - 1);
-        else if (char === "[") brackets++;
-        else if (char === "]") brackets = Math.max(0, brackets - 1);
-        else if (!parentheses && !brackets && separators.includes(char)) {
+
+        if (!parentheses && !brackets && separators.includes(char)) {
             if (callback(char, index) === false) return;
         }
     }
