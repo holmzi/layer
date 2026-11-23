@@ -259,3 +259,48 @@ fieldset input:focus-visible + span {
         outline: 1px solid Highlight;
     }
 }
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#expand {
+    padding: 4px;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+}
+
+#expand svg {
+    display: block;
+}
+
+#expand:hover, #expand:focus-visible {
+    color: var(--foreground);
+}
+
+body.expanded {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+}
+
+.expanded header {
+    font-weight: 600;
+}
+
+.expanded main {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.expanded .editor-area {
+    flex: 1;
+    min-height: 0;
+}

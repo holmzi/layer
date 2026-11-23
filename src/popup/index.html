@@ -6,6 +6,7 @@
     <title>Layer</title>
     <link rel="stylesheet" href="popup.css">
     <script src="../settings.js" defer></script>
+    <script src="editing.js" defer></script>
     <script src="popup.js" defer></script>
 </head>
 <body>
@@ -20,9 +21,16 @@
                 <span id="hostname">Site</span>
             </label>
         </fieldset>
-        <label class="switch">
-            <input id="enabled" type="checkbox" role="switch" disabled>
-        </label>
+        <div class="actions">
+            <button id="expand" type="button" title="Open in a tab" aria-label="Open in a tab" disabled>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                    <path d="M9 2h5v5m0-5L9 7M7 14H2V9m0 5 5-5"/>
+                </svg>
+            </button>
+            <label class="switch">
+                <input id="enabled" type="checkbox" role="switch" disabled>
+            </label>
+        </div>
     </header>
     <main>
         <p id="error" role="alert" hidden></p>
