@@ -162,18 +162,56 @@ async function activeHostname() {
     try {
         return await chrome.tabs.sendMessage(tab.id, { type: "hostname" }, { frameId: 0 });
     } catch {
-        // Browser pages and other protected documents have no content script.
         return "";
     }
 }
 
 async function openEditor() {
-    const hostname = await activeHostname();
+    const url = new URL(location.href);
+    const expanded = url.searchParams.has("hostname");
+    document.body.classList.toggle("expanded", expanded);
+    const expand = document.querySelector("#expand");
+    expand.hidden = expanded;
+    const hostname = expanded ? url.searchParams.get("hostname") : await activeHostname();
     const global = styleKeys();
     const site = hostname ? styleKeys(hostname) : null;
-    const values = await chrome.storage.local.get(styleDefaults(site ? [global, site] : [global]));
+    const defaults = styleDefaults(site ? [global, site] : [global]);
     const errors = {};
-    let current = site ?? global;
+    const values = { ...defaults };
+    const pending = new Map();
+    const received = {};
+    let ready = false;
+    let current = url.searchParams.get("scope") === "global" ? global : site ?? global;
+
+    if (expanded) {
+        const title = document.createElement("span");
+        title.textContent = current === global ? "Global" : hostname;
+        document.querySelector("header").replaceChildren(title);
+        document.title = `${title.textContent} · Layer`;
+    }
+
+    function updateValue(key, value) {
+        values[key] = value;
+        if (!ready) {
+            received[key] = value;
+            return;
+        }
+        if (current.css === key && editor.value !== value) {
+            editor.value = value;
+            updateEditor();
+        }
+        if (current.enabled === key) enabled.checked = value;
+    }
+
+    chrome.storage.local.onChanged.addListener((changes) => {
+        for (const [key, change] of Object.entries(changes)) {
+            if (Object.hasOwn(defaults, key) && !pending.has(key)) {
+                updateValue(key, change.newValue ?? defaults[key]);
+            }
+        }
+    });
+    Object.assign(values, await chrome.storage.local.get(defaults), received);
+    ready = true;
 
     function showSaveError() {
         showError(errors[current.css] || errors[current.enabled] || "");
@@ -191,31 +229,45 @@ async function openEditor() {
 
     async function save(key, value) {
         values[key] = value;
+        const write = chrome.storage.local.set({ [key]: value });
+        pending.set(key, write);
         let message = "";
         try {
-            await chrome.storage.local.set({ [key]: value });
+            await write;
         } catch (error) {
             message = `Could not save changes. ${error.message}`;
         }
-
-        if (values[key] !== value) return;
+        if (pending.get(key) !== write) return;
         errors[key] = message;
+        pending.delete(key);
         showSaveError();
     }
 
-    if (site) {
+    expand.disabled = false;
+    expand.addEventListener("click", async () => {
+        url.searchParams.set("hostname", hostname);
+        url.searchParams.set("scope", current === global ? "global" : "site");
+        try {
+            await chrome.tabs.create({ url: url.href });
+        } catch (error) {
+            showError(error.message);
+        }
+    });
+
+    if (!expanded && site) {
         const siteInput = document.querySelector("#site");
         const label = document.querySelector("#hostname");
         label.textContent = hostname;
         label.title = hostname;
         siteInput.disabled = false;
-        siteInput.checked = true;
+        siteInput.checked = current === site;
     }
 
     render();
     scopes.disabled = false;
     enabled.disabled = false;
     editor.disabled = false;
+    enableCodeEditing(editor);
     editor.focus();
 
     scopes.addEventListener("change", (event) => {

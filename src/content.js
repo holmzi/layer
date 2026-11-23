@@ -1,7 +1,6 @@
 (() => {
     "use strict";
 
-    // Installation can reach a document that already ran the manifest script.
     if (globalThis.layerAttached) return;
     globalThis.layerAttached = true;
 

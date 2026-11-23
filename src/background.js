@@ -15,8 +15,6 @@ async function applyStyles(target, applied, desired) {
         applied.splice(applied.lastIndexOf(css), 1);
     }
 
-    // Chrome removes by CSS text. Retire reused text before inserting it in its new position.
-    // Other sheets can stay visible until their replacements are in place.
     for (const css of obsolete) {
         if (additions.includes(css)) await remove(css);
     }
@@ -45,7 +43,6 @@ chrome.runtime.onInstalled.addListener(async () => {
     const [script] = chrome.runtime.getManifest().content_scripts;
     const tabs = await chrome.tabs.query({ url: script.matches, discarded: false });
 
-    // Existing tabs predate the manifest registration. Protected or closed tabs may reject injection.
     const injections = tabs.map(({ id }) => chrome.scripting.executeScript({
         target: { tabId: id, allFrames: script.all_frames },
         files: script.js,
