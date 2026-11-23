@@ -12,12 +12,13 @@
         "default_popup": "src/popup/index.html"
     },
     "background": {
-        "service_worker": "src/background.js"
+        "service_worker": "src/background/index.js",
+        "type": "module"
     },
     "content_scripts": [
         {
             "matches": ["<all_urls>"],
-            "js": ["src/settings.js", "src/content.js"],
+            "js": ["src/storage/index.js", "src/stylesheet/token.js", "src/stylesheet/parser.js", "src/content/index.js"],
             "run_at": "document_start",
             "all_frames": true
         }

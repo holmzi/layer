@@ -1,0 +1,152 @@
+.editor-area {
+    --editor-padding-y: 10px;
+    --editor-padding-x: 12px;
+    display: flex;
+    height: 320px;
+    border-top: 1px solid var(--subtle);
+    background: var(--surface-secondary);
+}
+
+#line-numbers {
+    flex: none;
+    width: 32px;
+    overflow: hidden;
+    color: var(--muted);
+    font: 400 12px/20px "JetBrains Mono", monospace;
+    text-align: right;
+    user-select: none;
+}
+
+#line-number-content {
+    padding: 10px 8px 10px 0;
+    white-space: pre;
+    font-variant-ligatures: none;
+}
+
+.editor-content {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+}
+
+#syntax-layer {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    user-select: none;
+}
+
+#syntax-content {
+    width: max-content;
+    margin: 0;
+    padding: var(--editor-padding-y) var(--editor-padding-x);
+    font: inherit;
+}
+
+#syntax-layer,
+textarea {
+    font: 400 12px/20px "JetBrains Mono", monospace;
+    font-variant-ligatures: none;
+    tab-size: 4;
+}
+
+.syntax-selector { color: #6897bb; }
+.syntax-property { color: #a3b9d0; }
+.syntax-value { color: #c7ab7c; }
+.syntax-string { color: #74a87a; }
+.syntax-comment { color: #868a91; }
+.syntax-at-rule { color: #3574f0; }
+
+textarea {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    resize: none;
+    padding: var(--editor-padding-y) var(--editor-padding-x);
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--foreground);
+    caret-color: var(--foreground);
+    user-select: text;
+    scrollbar-width: thin;
+    scrollbar-color: var(--muted) transparent;
+}
+
+.editor-content.highlight-ready textarea {
+    color: transparent;
+}
+
+textarea::selection {
+    color: transparent;
+    background: rgb(53 116 240 / 30%);
+}
+
+textarea:focus {
+    outline: none;
+}
+
+.expanded .editor-area {
+    flex: 1;
+    min-height: 0;
+}
+
+@media (forced-colors: active) {
+    textarea:focus {
+        outline: 1px solid Highlight;
+    }
+}
+
+::highlight(css-error) {
+    text-decoration: underline wavy #de8383;
+}
+
+#diagnostics {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-top: 1px solid var(--subtle);
+}
+
+#diagnostics button {
+    background: transparent;
+    color: #de9898;
+    border: 0;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+#problem {
+    flex: 1;
+    text-align: left;
+}
+
+#completion {
+    position: fixed;
+    z-index: 1;
+    width: min(230px, 65vw);
+    max-height: min(152px, 40vh);
+    overflow-y: auto;
+    padding: 0;
+    border: 1px solid var(--subtle);
+    background: var(--surface);
+    font: 400 12px/20px "JetBrains Mono", monospace;
+    scrollbar-width: thin;
+}
+
+#completion [role="option"] {
+    padding: 0 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+#completion [aria-selected="true"], #completion [role="option"]:hover {
+    background: var(--accent);
+}

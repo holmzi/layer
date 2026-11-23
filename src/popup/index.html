@@ -4,30 +4,68 @@
     <meta charset="utf-8">
     <meta name="color-scheme" content="dark">
     <title>Layer</title>
-    <link rel="stylesheet" href="popup.css">
-    <script src="../settings.js" defer></script>
-    <script src="editing.js" defer></script>
-    <script src="popup.js" defer></script>
+    <link rel="stylesheet" href="theme/base.css">
+    <link rel="stylesheet" href="theme/toolbar.css">
+    <link rel="stylesheet" href="theme/library.css">
+    <link rel="stylesheet" href="theme/editor.css">
+    <script src="../storage/index.js"></script>
+    <script src="../stylesheet/token.js"></script>
+    <script src="../stylesheet/parser.js"></script>
+    <script type="module" src="index.js"></script>
 </head>
 <body>
     <header>
-        <fieldset id="scopes" aria-label="Style scope" disabled>
-            <label>
-                <input type="radio" name="scope" value="global" checked>
-                <span>Global</span>
-            </label>
-            <label>
-                <input id="site" type="radio" name="scope" value="site" disabled>
-                <span id="hostname">Site</span>
-            </label>
-        </fieldset>
+        <span id="hostname"></span>
+        <button id="choose" type="button" popovertarget="styles" aria-label="Choose stylesheet" hidden>
+            <span id="style-name"></span>
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path d="m4 6 4 4 4-4"/>
+            </svg>
+        </button>
+        <section id="styles" popover aria-label="Stylesheets">
+            <form id="find-style">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                    <circle cx="6.5" cy="6.5" r="4.5"/><path d="m10 10 4 4"/>
+                </svg>
+                <input id="search" type="search" aria-label="Search or enter a hostname"
+                    placeholder="Search or enter a hostname" autocomplete="off" spellcheck="false">
+            </form>
+            <div id="style-list"></div>
+            <button id="create" type="button" hidden></button>
+            <p id="empty" hidden>No matching styles</p>
+        </section>
         <div class="actions">
-            <button id="pick" type="button" title="Pick an element" aria-label="Pick an element" disabled>
+            <button id="open-site" type="button" aria-label="Open site" hidden>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                    <path d="M9 2h5v5m0-5L7 9M7 3H2v11h11V9"/>
+                </svg>
+            </button>
+            <button id="import-css" type="button" aria-label="Import CSS" disabled>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                    <path d="M8 2v8m-3-3 3 3 3-3M2 10v4h12v-4"/>
+                </svg>
+            </button>
+            <button id="export-css" type="button" aria-label="Export CSS" disabled>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                    <path d="M8 11V3M5 6l3-3 3 3M2 10v4h12v-4"/>
+                </svg>
+            </button>
+            <button id="copy-css" type="button" aria-label="Copy CSS" disabled>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                    <path d="M6 6h8v8H6zM10 4V2H2v8h2"/>
+                </svg>
+            </button>
+            <button id="remove" type="button" aria-label="Delete stylesheet" hidden>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                    <path d="M2 4h12M6 4V2h4v2M4 4l.7 10h6.6L12 4M7 7v4m2-4v4"/>
+                </svg>
+            </button>
+            <button id="pick" type="button" aria-label="Pick an element" disabled>
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                     <path d="M6 2H2v4m8-4h4v4M2 10v4h4m1-7 2.5 7 1.5-3 3-1.5z"/>
                 </svg>
             </button>
-            <button id="expand" type="button" title="Open in a tab" aria-label="Open in a tab" disabled>
+            <button id="expand" type="button" aria-label="Open in a tab" disabled>
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                     <path d="M9 2h5v5m0-5L9 7M7 14H2V9m0 5 5-5"/>
                 </svg>
@@ -37,6 +75,15 @@
             </label>
         </div>
     </header>
+    <input id="css-file" type="file" accept=".css" hidden>
+    <dialog id="confirm-delete" aria-labelledby="delete-title" aria-describedby="delete-name">
+        <h2 id="delete-title">Delete stylesheet?</h2>
+        <p id="delete-name"></p>
+        <form method="dialog">
+            <button value="cancel" autofocus>Cancel</button>
+            <button value="delete">Delete</button>
+        </form>
+    </dialog>
     <main>
         <p id="error" role="alert" hidden></p>
         <div class="editor-area">
@@ -47,11 +94,17 @@
                 <div id="syntax-layer" aria-hidden="true">
                     <pre id="syntax-content"></pre>
                 </div>
-                <textarea id="editor" aria-label="CSS" spellcheck="false" autocomplete="off"
+                <textarea id="editor" aria-label="CSS" aria-autocomplete="list" aria-controls="completion" spellcheck="false" autocomplete="off"
                     autocapitalize="off" autocorrect="off" writingsuggestions="false"
                     wrap="off" disabled></textarea>
             </div>
         </div>
+        <div id="diagnostics" hidden>
+            <button id="problem" type="button"></button>
+            <button id="previous-problem" type="button" aria-label="Previous error">↑</button>
+            <button id="next-problem" type="button" aria-label="Next error">↓</button>
+        </div>
+        <div id="completion" role="listbox" aria-label="CSS suggestions" hidden></div>
     </main>
 </body>
 </html>

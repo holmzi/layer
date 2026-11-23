@@ -1,0 +1,181 @@
+#hostname, #choose {
+    min-width: 0;
+    margin-right: 10px;
+    padding: 4px 8px;
+    overflow: hidden;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#choose, #styles button, #confirm-delete button {
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+#choose {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    anchor-name: --style-button;
+}
+
+#style-name, #styles button {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#choose svg, #find-style svg {
+    flex: none;
+    color: var(--muted);
+}
+
+#choose:hover svg, #choose:focus-visible svg {
+    color: var(--foreground);
+}
+
+#styles, #confirm-delete {
+    padding: 0;
+    border: 1px solid var(--subtle);
+    background: var(--surface-secondary);
+    color: var(--foreground);
+    font: 400 14px/1.4 "Inter", sans-serif;
+}
+
+#styles {
+    position: fixed;
+    inset: 48px auto auto 12px;
+    position-anchor: --style-button;
+    top: anchor(bottom);
+    left: anchor(left);
+    width: min(320px, calc(100vw - 24px));
+    margin: 4px 0 0;
+}
+
+#find-style, #confirm-delete form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+}
+
+#find-style {
+    padding: 2px 12px;
+    border-bottom: 1px solid var(--subtle);
+}
+
+#search {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+}
+
+#search:focus-visible {
+    outline: none;
+}
+
+#find-style:focus-within svg {
+    color: var(--foreground);
+}
+
+#style-list {
+    max-height: min(46vh, 340px);
+    padding: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+#style-list:empty {
+    display: none;
+}
+
+#styles button {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0 32px 0 12px;
+    text-align: left;
+}
+
+#styles button:hover, #styles button:focus-visible, #confirm-delete button:hover {
+    background: var(--subtle);
+}
+
+#styles button:focus-visible {
+    outline-offset: -2px;
+}
+
+#style-list [aria-current="true"] {
+    background: var(--surface);
+    font-weight: 600;
+}
+
+#style-list [aria-current="true"]::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 13px;
+    width: 5px;
+    height: 9px;
+    border: solid currentColor;
+    border-width: 0 1.5px 1.5px 0;
+    transform: translateY(-65%) rotate(45deg);
+}
+
+#styles #create {
+    border-top: 1px solid var(--subtle);
+}
+
+#empty {
+    margin: 10px 12px;
+    color: var(--muted);
+}
+
+#confirm-delete {
+    width: min(320px, calc(100vw - 24px));
+}
+
+#confirm-delete::backdrop {
+    background: rgb(0 0 0 / 48%);
+}
+
+#delete-title {
+    margin: 0;
+    padding: 12px 14px 4px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+#delete-name {
+    margin: 0;
+    padding: 0 14px 14px;
+    overflow-wrap: anywhere;
+    font: 400 12px/20px "JetBrains Mono", monospace;
+}
+
+#confirm-delete form {
+    justify-content: flex-end;
+    padding: 6px 8px;
+    border-top: 1px solid var(--subtle);
+}
+
+#confirm-delete button {
+    padding: 4px 10px;
+}
+
+#confirm-delete button[value="delete"] {
+    background: var(--subtle);
+    font-weight: 600;
+}
+
+#confirm-delete button[value="delete"]:hover {
+    background: var(--accent);
+}

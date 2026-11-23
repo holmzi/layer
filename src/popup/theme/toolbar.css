@@ -1,0 +1,94 @@
+header, .switch {
+    display: flex;
+    align-items: center;
+}
+
+header {
+    justify-content: space-between;
+    padding: 12px;
+}
+
+.switch {
+    flex: none;
+    color: var(--muted);
+    cursor: pointer;
+}
+
+.switch input {
+    appearance: none;
+    display: grid;
+    align-items: center;
+    width: 28px;
+    height: 16px;
+    margin: 0;
+    padding: 2px;
+    border-radius: 12px;
+    border: 1px solid var(--subtle);
+    cursor: inherit;
+}
+
+.switch input::before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--muted);
+}
+
+.switch input:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.switch input:checked::before {
+    transform: translateX(12px);
+    background: var(--foreground);
+    border-color: var(--muted);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .switch input {
+        transition: background-color 100ms ease, border-color 100ms ease;
+    }
+
+    .switch input::before {
+        transition: transform 100ms ease, background-color 100ms ease;
+    }
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.actions button {
+    padding: 4px;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+}
+
+.actions button svg {
+    display: block;
+}
+
+.actions button:enabled:hover, .actions button:focus-visible {
+    color: var(--foreground);
+}
+
+.actions button:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+@media (forced-colors: active) {
+    .switch input {
+        appearance: auto;
+    }
+
+    .switch input::before {
+        content: none;
+    }
+}
