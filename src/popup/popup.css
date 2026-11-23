@@ -266,7 +266,7 @@ fieldset input:focus-visible + span {
     gap: 10px;
 }
 
-#expand {
+.actions button {
     padding: 4px;
     border: 0;
     background: transparent;
@@ -274,12 +274,17 @@ fieldset input:focus-visible + span {
     cursor: pointer;
 }
 
-#expand svg {
+.actions button svg {
     display: block;
 }
 
-#expand:hover, #expand:focus-visible {
+.actions button:enabled:hover, .actions button:focus-visible {
     color: var(--foreground);
+}
+
+.actions button:disabled {
+    opacity: 0.4;
+    cursor: default;
 }
 
 body.expanded {

@@ -3,7 +3,7 @@
     "name": "Layer",
     "version": "1.0.0",
     "description": "Edit custom CSS for every website or just the current one.",
-    "minimum_chrome_version": "106",
+    "minimum_chrome_version": "127",
     "permissions": ["storage", "scripting"],
     "host_permissions": ["<all_urls>"],
     "icons": { "128": "res/icons/128.png" },

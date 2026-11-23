@@ -27,6 +27,46 @@ async function applyStyles(target, applied, desired) {
     }
 }
 
+async function openPickerPopup(tab, hostname, selector) {
+    const key = `picker:${tab.id}`;
+    await chrome.storage.session.set({ [key]: { hostname, selector } });
+    const active = await chrome.tabs.get(tab.id);
+    if (!active.active) return;
+    await chrome.action.openPopup({ windowId: active.windowId });
+}
+
+chrome.runtime.onConnect.addListener((port) => {
+    if (port.name !== "picked-element") return;
+    const sender = port.sender;
+    if (sender?.tab?.id == null || sender.frameId !== 0 || !sender.url) {
+        port.disconnect();
+        return;
+    }
+
+    const hostname = new URL(sender.url).hostname;
+    port.onMessage.addListener(async ({ selector }) => {
+        if (!hostname || typeof selector !== "string" || !selector) {
+            port.disconnect();
+            return;
+        }
+        let error = "";
+        try {
+            await openPickerPopup(sender.tab, hostname, selector);
+        } catch (cause) {
+            error = cause.message;
+        }
+        try {
+            port.postMessage({ error });
+        } catch {
+            // The source document can close while the popup opens.
+        }
+    });
+});
+
+chrome.tabs.onRemoved.addListener((tabId) => {
+    chrome.storage.session.remove(`picker:${tabId}`);
+});
+
 chrome.runtime.onMessage.addListener((message, sender, reply) => {
     if (message.type !== "apply" || !sender.tab || !sender.documentId) return;
 

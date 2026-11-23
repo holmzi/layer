@@ -144,6 +144,53 @@ function updateSyntaxHighlighting() {
     editorContent.classList.add("highlight-ready");
 }
 
+function openSelector(selector) {
+    const sheet = new CSSStyleSheet();
+    function normalize(text) {
+        try {
+            sheet.insertRule(text + " {}");
+            const normalized = sheet.cssRules[0].selectorText;
+            sheet.deleteRule(0);
+            return normalized;
+        } catch {
+            return null;
+        }
+    }
+
+    const wanted = normalize(selector);
+    if (!wanted) return;
+    const source = editor.value;
+    let start = 0;
+    let depth = 0;
+    let caret = -1;
+    scanSeparators(source, "{};", (char, index) => {
+        if (char === "{") {
+            if (!depth && normalize(source.slice(start, index)) === wanted) {
+                const body = source.slice(index + 1);
+                caret = index + 1 + body.match(/^[ \t]*(?:\n[ \t]*)?/)[0].length;
+                return false;
+            }
+            depth++;
+        } else if (char === "}") {
+            depth = Math.max(0, depth - 1);
+        }
+        if (!depth) start = index + 1;
+    });
+
+    if (caret === -1) {
+        const separator = !source || source.endsWith("\n\n") ? "" : source.endsWith("\n") ? "\n" : "\n\n";
+        const prefix = separator + selector + " {\n    ";
+        editor.setRangeText(prefix + "\n}", source.length, source.length);
+        caret = source.length + prefix.length;
+        editor.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+    editor.setSelectionRange(caret, caret);
+    const line = editor.value.slice(0, caret).split("\n").length - 1;
+    const lineHeight = parseFloat(getComputedStyle(editor).lineHeight);
+    editor.scrollTop = Math.max(0, line * lineHeight - editor.clientHeight / 2);
+    syncEditorScroll();
+}
+
 function updateEditor() {
     updateLineNumbers();
     updateSyntaxHighlighting();
@@ -155,8 +202,7 @@ function showError(message) {
     errorText.hidden = !message;
 }
 
-async function activeHostname() {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+async function activeHostname(tab) {
     if (tab?.id == null) return "";
 
     try {
@@ -172,7 +218,10 @@ async function openEditor() {
     document.body.classList.toggle("expanded", expanded);
     const expand = document.querySelector("#expand");
     expand.hidden = expanded;
-    const hostname = expanded ? url.searchParams.get("hostname") : await activeHostname();
+    const [tab] = expanded ? [] : await chrome.tabs.query({ active: true, currentWindow: true });
+    const hostname = expanded ? url.searchParams.get("hostname") : await activeHostname(tab);
+    const selectionKey = tab ? `picker:${tab.id}` : null;
+    const selection = selectionKey ? (await chrome.storage.session.get(selectionKey))[selectionKey] : null;
     const global = styleKeys();
     const site = hostname ? styleKeys(hostname) : null;
     const defaults = styleDefaults(site ? [global, site] : [global]);
@@ -243,6 +292,24 @@ async function openEditor() {
         showSaveError();
     }
 
+    if (!expanded && site) {
+        const pick = document.querySelector("#pick");
+        pick.disabled = false;
+        pick.addEventListener("click", async () => {
+            pick.disabled = true;
+            try {
+                await chrome.scripting.executeScript({
+                    target: { tabId: tab.id, frameIds: [0] },
+                    files: ["src/picker.js"],
+                });
+                window.close();
+            } catch (error) {
+                pick.disabled = false;
+                showError(error.message);
+            }
+        });
+    }
+
     expand.disabled = false;
     expand.addEventListener("click", async () => {
         url.searchParams.set("hostname", hostname);
@@ -280,6 +347,11 @@ async function openEditor() {
     });
     editor.addEventListener("scroll", syncEditorScroll);
     enabled.addEventListener("change", () => save(current.enabled, enabled.checked));
+
+    if (selection) {
+        if (site && selection.hostname === hostname) openSelector(selection.selector);
+        await chrome.storage.session.remove(selectionKey);
+    }
 }
 
 openEditor().catch((error) => showError(`Could not open the editor. ${error.message}`));
